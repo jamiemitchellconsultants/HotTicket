@@ -1,0 +1,59 @@
+﻿@page "/fetchperformances"
+@using HotTicket.Shared
+@using System.Text.Json.Serialization
+@using System.Text.Json
+@inject HttpClient _http
+
+<h1>Weather performance</h1>
+
+<p>This component demonstrates fetching performances from the server.</p>
+
+@if (performances == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+        <tr>
+            <th>Area</th>
+            <th>Performance (C)</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var performance in performances)
+        {
+            <tr>
+                <td>@performance.AreaName</td>
+                <td>@performance.PerformanceName</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+@code {
+    private PerformanceModel[] performances;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var respJson = await _http.GetAsync("api/Performance");
+            var respJsonContent = await respJson.Content.ReadAsStringAsync();
+
+            var _options = new JsonSerializerOptions {PropertyNameCaseInsensitive = true};
+
+            performances = JsonSerializer.Deserialize<PerformanceModel[]>(respJsonContent,_options);
+
+    //performances = await Http.GetFromJsonAsync<PerformanceModel[]>("api/Performances");
+        }
+        catch (Exception ex)
+        {
+            performances = new PerformanceModel[] {new PerformanceModel{AreaName = ex.Message,PerformanceName = ex.StackTrace}};
+        }
+
+    }
+
+}

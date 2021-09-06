@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>bin\debug\net5.0\HotTicket.Server.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="5.0.9" />
+    <PackageReference Include="Microsoft.Orleans.Core" Version="3.5.0" />
+    <PackageReference Include="Microsoft.Orleans.OrleansProviders" Version="3.5.0" />
+    <PackageReference Include="Microsoft.Orleans.Server" Version="3.5.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Client\HotTicket.Client.csproj" />
+    <ProjectReference Include="..\Orleans\PublicTicketInterfaces\PublicTicketInterfaces.csproj" />
+    <ProjectReference Include="..\Orleans\TicketGrains\TicketGrains.csproj" />
+    <ProjectReference Include="..\Orleans\TicketInterfaces\TicketInterfaces.csproj" />
+    <ProjectReference Include="..\Orleans\TicketMessages\TicketMessages.csproj" />
+    <ProjectReference Include="..\Shared\HotTicket.Shared.csproj" />
+  </ItemGroup>
+
+
+</Project>

@@ -1,0 +1,28 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+	  <TargetFramework>net5.0</TargetFramework>
+    <Nullable>disable</Nullable>
+  </PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Orleans.CodeGenerator.MSBuild" Version="3.5.0">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.Orleans.Core.Abstractions" Version="3.5.0" />
+		<PackageReference Include="Microsoft.Orleans.OrleansProviders" Version="3.5.0" />
+	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\TicketInterfaces\TicketInterfaces.csproj" />
+	  <ProjectReference Include="..\TicketMessages\TicketMessages.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Orleans_CodeGenInputs Remove="AreaGrain.cs" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Orleans_CodeGenInputs Remove="SeatGrain.cs" />
+	</ItemGroup>
+	<ItemGroup>
+	  <Orleans_CodeGenInputs Remove="TicketGrain.cs" />
+	</ItemGroup>
+</Project>
