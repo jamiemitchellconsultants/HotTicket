@@ -36,7 +36,7 @@ namespace HotTicket.Server.Controllers
         [Produces(typeof(List<PerformanceModel>))]
         public async Task<IActionResult> GetPerformances()
         {
-            var indexGrain = _clusterClient.GetGrain<IIndex<IPerformance>>("performance");
+            var indexGrain = _clusterClient.GetGrain<IPublicIndex<IPerformance>>("performance");
             var performances = await indexGrain.GetItems("", IndexFilter.all);
             var result = new List<PerformanceModel>();
             var performanceTasks = new List<Task<GrainResponse<PerformanceData>>>();

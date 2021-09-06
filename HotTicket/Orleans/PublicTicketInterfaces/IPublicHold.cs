@@ -8,7 +8,7 @@ namespace PublicTicketInterfaces
 {
     public interface IPublicHold:IGrainWithGuidKey
     {
-        Task<GrainResponse< HoldResponse>> GetHoldData();
+        Task<GrainResponse< HoldResponse>> GetHoldData(bool includePhysicalSeats, bool includeTickets);
         Task<GrainResponse<HoldResponse>> HoldSeat(Guid seat);
         Task<GrainResponse<HoldResponse>> HoldSeats(List<Guid> seats);
         Task<GrainResponse<TicketsMessage>> Sell();

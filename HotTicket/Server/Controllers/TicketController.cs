@@ -96,9 +96,10 @@ namespace HotTicket.Server.Controllers
 
             holdGrain = _clusterClient.GetGrain<IPublicHold>(sale.HoldId.Value);
             saleResponse = await holdGrain.Sell();
-            return !saleResponse.Success ? Problem() : CreatedAtAction("GetTickets", new {id = sale.HoldId.Value});
+            return !saleResponse.Success ? Problem() : CreatedAtAction("GetTickets", new {holdId = sale.HoldId.Value});
             //ok so just got a hold id here
         }
+
         /// <summary>
         /// Gets all the tickets for seats in a hold
         /// </summary>
@@ -109,13 +110,24 @@ namespace HotTicket.Server.Controllers
         public async Task<IActionResult> GetTickets(Guid holdId)
         {
             var holdGrain = _clusterClient.GetGrain<IPublicHold>(holdId);
-            var holdResponse = await holdGrain.GetHoldData();
+            var holdResponse = await holdGrain.GetHoldData(true,true);
             if (!holdResponse.Success)
             {
                 return Problem(holdResponse.ErrorMessage, "", StatusCodes.Status410Gone);
             }
-            await Task.CompletedTask;
-            return Problem();
+
+            var tickets = new List<TicketModel>();
+            foreach (var ticket in holdResponse.Result.TicketsMessage.Tickets)
+            {
+                tickets.Add(new TicketModel
+                {
+                    AreaName = holdResponse.Result.TicketsMessage.AreaName,
+                    PerformanceName = holdResponse.Result.TicketsMessage.PerformanceName,
+                    EntryCode = ticket.EntryCode,
+                    PhysicalSeatNumber = ticket.SeatNumber
+                });
+            }
+            return Ok(tickets);
         }
     }
 

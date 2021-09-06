@@ -85,14 +85,19 @@ namespace TicketGrains
             {
                 return  GrainResponse<ITicket>.FailureResponse("Sold or on hold");
             }
+            //var holdResponse =
+            //await _store.State.Performance.MarkSeatNotAvailable(this.AsReference<ISeat>());
 
             var ticket = GrainFactory.GetGrain<ITicket>(Guid.NewGuid());
             var initResponse= await ticket.Initialize(this.AsReference<ISeat>());
             if (!initResponse.Success)
             {
+                //gotta return seat to available
                 return GrainResponse<ITicket>.FailureResponse(initResponse.ErrorMessage);
             }
             _store.State.Ticket = ticket;
+
+            //got to get the performance available seats and remove this one
             await _store.WriteStateAsync();
             return GrainResponse<ITicket>.SuccessResponse(ticket);
         }
@@ -117,7 +122,7 @@ namespace TicketGrains
 
         }
 
-        public async Task<GrainResponse<InternalSeatData>> GetInternalData()
+        public async Task<GrainResponse<InternalSeatData>> GetInternalData(bool includeTicket=false)
         {
             string physicalSeatNumber = "";
             if (_store.State.PhysicalSeat != null)
@@ -129,11 +134,23 @@ namespace TicketGrains
                 }
             }
 
+            TicketDetails ticketDetails = default;
+            if (includeTicket)
+            {
+                var ticketDetailsResponse = await _store.State.Ticket.GetDetails();
+                if (ticketDetailsResponse.Success)
+                {
+                    ticketDetails = ticketDetailsResponse.Result;
+                }
+            }
+
             return await Task.FromResult(GrainResponse<InternalSeatData>.SuccessResponse(
                 new InternalSeatData
                 {
-                    SeatId = this.GetPrimaryKey(), PhysicalSeatId = _store.State.PhysicalSeat.GetPrimaryKey(),
-                    PhysicalSeatName = physicalSeatNumber
+                    SeatId = this.GetPrimaryKey(), 
+                    PhysicalSeatId = _store.State.PhysicalSeat.GetPrimaryKey(),
+                    PhysicalSeatName = physicalSeatNumber,
+                    TicketDetails = ticketDetails
                 }));
         }
         public async Task<GrainResponse<IPerformance>> GetPerformance()
