@@ -10,11 +10,16 @@ using TicketMessages;
 
 namespace TicketGrains
 {
+    /// <summary>
+    /// Do not use this if you have more than a couple of hundred items
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public class IndexGrain<T>:Grain, IIndex<T> where T:IGrainWithGuidKey
     {
         private readonly IPersistentState<IndexState> _store;
 
-        readonly Dictionary<IndexFilter, Func<string, string, bool>> Comparisons = new()
+        //this should be injected
+        readonly Dictionary<IndexFilter, Func<string, string, bool>> comparisons = new()
         {
             {IndexFilter.eq,( a,  b)=>a==b  },
             {IndexFilter.gt,(a,b)=>string.Compare(a,b,StringComparison.InvariantCultureIgnoreCase)<0 },
@@ -49,10 +54,7 @@ namespace TicketGrains
             try
             {
                 if (_store.State.Items == null) return new List<T>();
-                var comp = Comparisons[filterType];
-                var grains = (from item in _store.State.Items where comp(item.Key, filter) select item.Value).Select(o => GrainFactory.GetGrain<T>(o)).ToList();
-                var gList = grains.ToList();
-                return await Task.FromResult(gList);
+                return await Task.FromResult((from item in _store.State.Items where comparisons[filterType](item.Key, filter) select item.Value).Select(o => GrainFactory.GetGrain<T>(o)).ToList());
             }
             catch (Exception ex)
             {

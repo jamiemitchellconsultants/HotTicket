@@ -72,7 +72,7 @@ namespace TestTickets
                 hold1List.Add(seatsMessage.Result.Seats[i+10].SeatId);
                 hold1List.Add(seatsMessage.Result.Seats[i+20].SeatId);
                 hold1List.Add(seatsMessage.Result.Seats[i+30].SeatId);
-                //mixing up the order for hold2 to create maximum chaos
+                //mixing up the order for hold2 to create some chaos
                 hold2List.Add(seatsMessage.Result.Seats[i + 20].SeatId);
                 hold2List.Add(seatsMessage.Result.Seats[i + 40].SeatId);
                 hold2List.Add(seatsMessage.Result.Seats[i + 10].SeatId);
@@ -80,9 +80,10 @@ namespace TestTickets
 
             }
 
+            //all async so initiate two tasks to try and hold two intersecting sets of seats
             var hold1Task = hold1Grain.HoldSeats(hold1List);
             var hold2Task = hold2Grain.HoldSeats(hold2List);
-
+            
             Task.WaitAll(hold1Task, hold2Task);
 
             var hold1TaskResult = hold1Task.Result;
@@ -93,7 +94,7 @@ namespace TestTickets
 
             var totalSeats = hold2TaskResult.Result.SeatsHeld.Count + hold1TaskResult.Result.SeatsHeld.Count;
 
-            //Add seats 0 to 40 to hold 1 and 10 to 29 + 40 to 49 to hold 2
+            //Seats 0 to 40 were added to hold 1 and 10 to 29 + 40 to 49 to hold 2
             //the two holds cover 70 seats, 40 in hold 1 and 30 in hold 2
             //a total of 50 distinct seats with a 20 seat overlap
             //so no matter what order the seats were request to be held, the total held in hold 1 and hold 2 must be 50
