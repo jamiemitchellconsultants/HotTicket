@@ -98,6 +98,16 @@ namespace TestTickets
             //a total of 50 distinct seats with a 20 seat overlap
             //so no matter what order the seats were request to be held, the total held in hold 1 and hold 2 must be 50
             Assert.AreEqual(50,totalSeats);
+
+            //now just try and sell a seat
+            var random = new Random();
+            var seatIndex = random.Next(50);
+            var testSeat = cluster.GrainFactory.GetGrain<ISeat>(seatsMessage.Result.Seats[seatIndex].SeatId);
+            var testSell = await testSeat.SellSeat();
+            //should not succeed
+            Assert.IsFalse(testSell.Success);
+
+            
         }
 
     }
