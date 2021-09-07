@@ -28,7 +28,7 @@ namespace TicketInterfaces
         /// <param name="hold">the hold containing the seat</param>
         /// <returns></returns>
         Task<GrainResponse< ITicket>> SellSeat(IHold hold );
-        Task<GrainResponse<InternalSeatData>> GetInternalData();
+        Task<GrainResponse<InternalSeatData>> GetInternalData(bool includeTicket=false);
         Task<GrainResponse<IPerformance>> GetPerformance();
         Task<GrainResponse> ReleaseHold(IHold hold);
     }

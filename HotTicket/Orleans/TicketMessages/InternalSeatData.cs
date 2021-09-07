@@ -7,5 +7,6 @@ namespace TicketMessages
         public Guid SeatId { get; set; }
         public Guid PhysicalSeatId { get; set; }
         public string PhysicalSeatName { get; set; }
+        public TicketDetails TicketDetails { get; set; }
     }
 }

@@ -31,18 +31,18 @@ namespace HotTicket.Server.Controllers
         /// <summary>
         /// Get the seats available for the performance
         /// </summary>
-        /// <param name="performance">The name of the performance</param>
+        /// <param name="performanceName">The name of the performance</param>
         /// <returns></returns>
         [HttpGet]
         [Produces(typeof(List<SeatModel>))]
         [Route("performance/{performanceName}", Name = "GetPerformanceAvailableSeats")]
-        public async Task<IActionResult> GetPerformanceAvailableSeats(string performance)
+        public async Task<IActionResult> GetPerformanceAvailableSeats(string performanceName)
         {
             var performanceIndex = _clusterClient.GetGrain<IIndex<IPerformance>>("performance");
             var performanceGrain = await performanceIndex.GetItem(performance);
             if (performanceGrain == null)
             {
-                return NotFound(performance);
+                return NotFound(performanceName);
             }
 
             var area = await performanceGrain.GetAreaName();
@@ -52,9 +52,9 @@ namespace HotTicket.Server.Controllers
             }
 
             var areaGrain = _clusterClient.GetGrain<IPublicArea>(area.Result);
-            var seatsMessage = await areaGrain.GetAvailableSeats(performance);
+            var seatsMessage = await areaGrain.GetAvailableSeats(performanceName);
             return Ok(seatsMessage.Result.Seats.Select(o => new SeatModel
-            { Area = area.Result, Performance = performance, SeatId = o.SeatId.ToString() }));
+            { Area = area.Result, Performance = performanceName, SeatId = o.SeatId.ToString() }));
         }
 
 
@@ -102,7 +102,7 @@ namespace HotTicket.Server.Controllers
         public async Task<IActionResult> GetHold(Guid id)
         {
             var holdGrain = _clusterClient.GetGrain<IPublicHold>(id);
-            var holdResponse = await holdGrain.GetHoldData();
+            var holdResponse = await holdGrain.GetHoldData(false,false);
             if (!holdResponse.Success)
             {
                 return Problem(holdResponse.ErrorMessage);

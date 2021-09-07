@@ -19,9 +19,48 @@ namespace TicketGrains
             _store = store;
         }
 
-        public async Task<GrainResponse<HoldResponse>> GetHoldData()
+        public async Task<GrainResponse<HoldResponse>> GetHoldData(bool includePhysicalSeat=false, bool includeTicket=false)
         {
             var resp = new HoldResponse { HoldId = this.GetPrimaryKey(), SeatsHeld = _store.State.SeatsInHold.Select(o=>o.GetPrimaryKey()).ToList() };
+            if (includePhysicalSeat)
+            {
+                resp.SeatData = new List<SeatAndPhysicalItem>();
+                foreach (var seat in _store.State.SeatsInHold)
+                {
+                    var physSeatResp = await seat.GetInternalData(false);
+                    if (physSeatResp.Success)
+                    {
+                        resp.SeatData.Add(new SeatAndPhysicalItem
+                        {
+                            PhysicalSeatId = physSeatResp.Result.PhysicalSeatId,
+                            PhysicalSeatNumber = physSeatResp.Result.PhysicalSeatName,
+                            SeatId = physSeatResp.Result.SeatId
+                        });
+                    }
+
+                }
+
+            }
+
+            if (includeTicket)
+            {
+                var performanceResp =  await _store.State.Performance.GetPerformanceData();
+
+                var ticketsMessage = new TicketsMessage
+                {
+                    AreaName = performanceResp.Result.AreaName,
+                    PerformanceName = performanceResp.Result.PerformanceName
+                };
+                var ticketsList = new List<TicketDetails>();
+                ticketsMessage.Tickets = ticketsList;
+                foreach (var seat in _store.State.SeatsInHold)
+                {
+                    var seatresp = await seat.GetInternalData(true);
+                    var ticketDetails= seatresp.Result.TicketDetails;
+                    ticketsList.Add(ticketDetails);
+                }
+                resp.TicketsMessage = ticketsMessage;
+            }
             return await Task.FromResult( GrainResponse<HoldResponse>.SuccessResponse(resp));
         }
 
@@ -125,12 +164,51 @@ namespace TicketGrains
 
         public async Task<GrainResponse<TicketsMessage>> Sell()
         {
-            return await Task.FromResult( GrainResponse<TicketsMessage>.FailureResponse("Not Implemented"));
+            //go through each seat in the hold and create a ticket, linked to the seat.
+            var ticketList = new List<TicketDetails>();
+            var areaName = "";
+            var performanceName = "";
+            try
+            {
+                foreach (var seat in _store.State.SeatsInHold)
+                {
+                    
+                    var ticketResponse = await seat.SellSeat(this.AsReference<IHold>());
+                    if (ticketResponse.Success)
+                    {
+                        var ticketMessage =await  ticketResponse.Result.GetDetails();
+                        if (areaName =="") areaName = ticketMessage.Result.AreaName;
+                        if (performanceName == "") performanceName = ticketMessage.Result.PerformanceName;
+                        ticketList.Add( new TicketDetails
+                        {
+                            EntryCode = ticketMessage.Result.EntryCode,
+                            SeatNumber = ticketMessage.Result.SeatNumber,
+                            TicketId = ticketMessage.Result.TicketId
+                        });
+                    }
+                }
+
+                var ticketsMessage = new TicketsMessage
+                {
+                    AreaName = areaName,
+                    PerformanceName = performanceName,
+                    Tickets = ticketList
+                };
+                return await Task.FromResult(GrainResponse<TicketsMessage>.SuccessResponse(ticketsMessage));
+            }
+            catch (Exception ex)
+            {
+                return GrainResponse<TicketsMessage>.FailureResponse(ex.Message);
+            }
+            finally
+            {
+
+            }
         }
     }
 
     public class HoldState
-    {
+    { 
         public IPerformance Performance { get; set; }
         public List<ISeat> SeatsInHold { get; set; }=new List<ISeat>();
     }
