@@ -10,7 +10,7 @@ using TicketMessages;
 
 namespace TicketGrains
 {
-    public class IndexGrain<T>:Grain, IPublicIndex<T> where T:IGrainWithGuidKey
+    public class IndexGrain<T>:Grain, IIndex<T> where T:IGrainWithGuidKey
     {
         private readonly IPersistentState<IndexState> _store;
 

@@ -39,7 +39,7 @@ namespace TicketGrains
                 _store.State.Name = performanceName;
                 _store.State.Area = area;
                 await _store.WriteStateAsync();
-                var performanceIndex = GrainFactory.GetGrain<IPublicIndex<IPerformance>>("performance");
+                var performanceIndex = GrainFactory.GetGrain<IIndex<IPerformance>>("performance");
                 await performanceIndex.AddItem(this.AsReference<IPerformance>(), performanceName);
                 return GrainResponse.SuccessResponse();
             }
