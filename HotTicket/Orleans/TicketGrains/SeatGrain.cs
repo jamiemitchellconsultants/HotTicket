@@ -86,7 +86,7 @@ namespace TicketGrains
                 return  GrainResponse<ITicket>.FailureResponse("Sold or on hold");
             }
             //var holdResponse =
-            //await _store.State.Performance.MarkSeatNotAvailable(this.AsReference<ISeat>());
+            await _store.State.Performance.MarkSeatNotAvailable(this.AsReference<ISeat>());
 
             var ticket = GrainFactory.GetGrain<ITicket>(Guid.NewGuid());
             var initResponse= await ticket.Initialize(this.AsReference<ISeat>());
@@ -97,7 +97,6 @@ namespace TicketGrains
             }
             _store.State.Ticket = ticket;
 
-            //got to get the performance available seats and remove this one
             await _store.WriteStateAsync();
             return GrainResponse<ITicket>.SuccessResponse(ticket);
         }
