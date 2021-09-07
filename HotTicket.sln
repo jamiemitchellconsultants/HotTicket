@@ -17,6 +17,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TicketInterfaces", "HotTick
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TicketGrains", "HotTicket\Orleans\TicketGrains\TicketGrains.csproj", "{91EAB90F-EE76-4E33-AF40-D96E3106843B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestTickets", "TestTickets\TestTickets.csproj", "{90CC7BBE-5955-4AAC-A8AB-7125D6C5B6CC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,10 @@ Global
 		{91EAB90F-EE76-4E33-AF40-D96E3106843B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{91EAB90F-EE76-4E33-AF40-D96E3106843B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{91EAB90F-EE76-4E33-AF40-D96E3106843B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{90CC7BBE-5955-4AAC-A8AB-7125D6C5B6CC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{90CC7BBE-5955-4AAC-A8AB-7125D6C5B6CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{90CC7BBE-5955-4AAC-A8AB-7125D6C5B6CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{90CC7BBE-5955-4AAC-A8AB-7125D6C5B6CC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
