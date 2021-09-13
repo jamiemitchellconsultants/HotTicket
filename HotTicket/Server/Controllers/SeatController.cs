@@ -38,7 +38,7 @@ namespace HotTicket.Server.Controllers
         [Route("performance/{performanceName}", Name = "GetPerformanceAvailableSeats")]
         public async Task<IActionResult> GetPerformanceAvailableSeats(string performanceName)
         {
-            var performanceIndex = _clusterClient.GetGrain<IPublicIndex<IPerformance>>("performance");
+            var performanceIndex = _clusterClient.GetGrain<IIndex<IPerformance>>("performance");
             var performanceGrain = await performanceIndex.GetItem(performanceName);
             if (performanceGrain == null)
             {
